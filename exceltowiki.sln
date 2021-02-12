@@ -3,7 +3,9 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 16
 VisualStudioVersion = 16.0.30907.101
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "exceltowiki", "exceltowiki.csproj", "{0835138E-49D0-4DA1-99F7-C5EBCEE675AD}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "exceltowiki", "src\exceltowiki.csproj", "{0835138E-49D0-4DA1-99F7-C5EBCEE675AD}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "src", "src", "{E941566E-9564-4CAB-82C5-B4E1EFDB2B5C}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -18,6 +20,9 @@ Global
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{0835138E-49D0-4DA1-99F7-C5EBCEE675AD} = {E941566E-9564-4CAB-82C5-B4E1EFDB2B5C}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {09CE36E1-1FA9-48E3-9E3C-765DAB942A83}
