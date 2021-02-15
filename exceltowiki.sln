@@ -9,12 +9,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "src", "src", "{E941566E-956
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "test", "test", "{D9238B42-5F0A-4B43-B909-888FA1C1781C}"
 EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "input", "input", "{CA93B6DB-14BE-4FDE-A637-B5013178869F}"
-	ProjectSection(SolutionItems) = preProject
-		test\input\API-metadata.xlsx = test\input\API-metadata.xlsx
-	EndProjectSection
-EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "output", "output", "{F41A1A89-5C4E-42CD-BB01-DB98CD79FC69}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "exceltowiki.Test", "test\exceltowiki.Test.csproj", "{19FA63C3-921E-42BD-9179-5D0B590936B5}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -26,14 +21,17 @@ Global
 		{0835138E-49D0-4DA1-99F7-C5EBCEE675AD}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{0835138E-49D0-4DA1-99F7-C5EBCEE675AD}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{0835138E-49D0-4DA1-99F7-C5EBCEE675AD}.Release|Any CPU.Build.0 = Release|Any CPU
+		{19FA63C3-921E-42BD-9179-5D0B590936B5}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{19FA63C3-921E-42BD-9179-5D0B590936B5}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{19FA63C3-921E-42BD-9179-5D0B590936B5}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{19FA63C3-921E-42BD-9179-5D0B590936B5}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
 	EndGlobalSection
 	GlobalSection(NestedProjects) = preSolution
 		{0835138E-49D0-4DA1-99F7-C5EBCEE675AD} = {E941566E-9564-4CAB-82C5-B4E1EFDB2B5C}
-		{CA93B6DB-14BE-4FDE-A637-B5013178869F} = {D9238B42-5F0A-4B43-B909-888FA1C1781C}
-		{F41A1A89-5C4E-42CD-BB01-DB98CD79FC69} = {D9238B42-5F0A-4B43-B909-888FA1C1781C}
+		{19FA63C3-921E-42BD-9179-5D0B590936B5} = {D9238B42-5F0A-4B43-B909-888FA1C1781C}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {09CE36E1-1FA9-48E3-9E3C-765DAB942A83}

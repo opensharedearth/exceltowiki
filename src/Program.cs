@@ -3,26 +3,27 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
 
 namespace exceltowiki
 {
-    class Program
+    public class Program
     {
-        public struct WorksheetDef
+        internal struct WorksheetDef
         {
             public int Index;
             public string Name;
             public object Reference => Name == null ? (object)Index : Name;
             public string Description => Name == null ? Index.ToString() : Name;
         };
-        public enum FormatType
+        internal enum FormatType
         {
             None,
             Date
         };
-        public struct ColumnDef
+        internal struct ColumnDef
         {
             public string Name;
             public FormatType Format;
@@ -30,7 +31,7 @@ namespace exceltowiki
         }
 
 
-        static void Main(string[] args)
+        internal static void Main(string[] args)
         {
             string inputFile = null;
             WorksheetDef worksheet = new WorksheetDef { Index = 1 };
@@ -60,6 +61,12 @@ namespace exceltowiki
                         case "--worksheet":
                             worksheet = GetWorksheet(GetArg(args, ++i));
                             break;
+                        case "--help":
+                            Usage();
+                            return;
+                        case "--version":
+                            Version();
+                            return;
                         default:
                             if (String.IsNullOrEmpty(arg)) throw new ApplicationException("Null argument seen on command line.");
                             if (arg[0] == '-') throw new ApplicationException($"Unrecognized switch argument {arg} seen.");
@@ -78,7 +85,7 @@ namespace exceltowiki
             }
         }
 
-        private static string GetDateFormat(string arg)
+        internal static string GetDateFormat(string arg)
         {
             string defaultDateFormat = "g";
             if(!String.IsNullOrEmpty(arg))
@@ -89,14 +96,14 @@ namespace exceltowiki
             return defaultDateFormat;
         }
 
-        private static string GetArg(string[] args, int iarg)
+        internal static string GetArg(string[] args, int iarg)
         {
             if (iarg >= 0 && iarg < args.Length)
                 return args[iarg];
             throw new ApplicationException("Missing command line argument.");
         }
 
-        private static WorksheetDef GetWorksheet(string arg)
+        internal static WorksheetDef GetWorksheet(string arg)
         {
             if (int.TryParse(arg, out int v))
                 return new WorksheetDef { Index = v };
@@ -104,7 +111,7 @@ namespace exceltowiki
                 return new WorksheetDef { Name = arg };
         }
 
-        private static bool ValidateDateFormat(string arg)
+        internal static bool ValidateDateFormat(string arg)
         {
             try
             {
@@ -117,7 +124,7 @@ namespace exceltowiki
             }
         }
 
-        private static void ConvertExcelToWiki(string inputFile, WorksheetDef worksheetDef, string[] columnNames, FormatType[] columnFormats, string dateFormat, bool headers)
+        internal static void ConvertExcelToWiki(string inputFile, WorksheetDef worksheetDef, string[] columnNames, FormatType[] columnFormats, string dateFormat, bool headers)
         {
             Microsoft.Office.Interop.Excel.Application app = new Microsoft.Office.Interop.Excel.Application();
             try
@@ -176,7 +183,7 @@ namespace exceltowiki
             }
         }
 
-        private static string[] GetExcelColumns(int ncolumns)
+        internal static string[] GetExcelColumns(int ncolumns)
         {
             if (ncolumns > 26 * 26) throw new ApplicationException("Source table has too many columns.");
             List<string> columns = new List<string>();
@@ -196,7 +203,7 @@ namespace exceltowiki
             return columns.ToArray();
         }
 
-        private static string FormatColumn(string s, ColumnDef cd)
+        internal static string FormatColumn(string s, ColumnDef cd)
         {
             switch (cd.Format)
             {
@@ -206,7 +213,7 @@ namespace exceltowiki
             }
         }
 
-        private static string FormatDate(string s, string dateFormat)
+        internal static string FormatDate(string s, string dateFormat)
         {
             if(DateTime.TryParse(s, out DateTime v))
             {
@@ -217,7 +224,7 @@ namespace exceltowiki
                 return s;
             }
         }
-        private static string[] GetColumnNames(string arg)
+        internal static string[] GetColumnNames(string arg)
         {
             string[] columns = arg.Split(',');
             foreach (var column in columns)
@@ -227,9 +234,10 @@ namespace exceltowiki
             return columns;
         }
 
-        private static ColumnDef[] GetColumns(int columns, string[] columnNames, FormatType[] columnFormats, string dateFormat)
+        internal static ColumnDef[] GetColumns(int columns, string[] columnNames, FormatType[] columnFormats, string dateFormat)
         {
             if (columnNames == null) columnNames = GetExcelColumns(columns);
+            if (columnFormats == null) columnFormats = new FormatType[0];
             if (columns < columnNames.Length) throw new ApplicationException("The source table does not have enough columns");
             List<ColumnDef> cds = new List<ColumnDef>();
             for(int i = 0; i < columnNames.Length; ++i)
@@ -243,7 +251,7 @@ namespace exceltowiki
             return cds.ToArray();
         }
 
-        private static bool IsValidExcelColumn(string column)
+        internal static bool IsValidExcelColumn(string column)
         {
             string column1 = column.ToUpper();
             string validColumns = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
@@ -253,7 +261,7 @@ namespace exceltowiki
             else return false;
         }
 
-        private static FormatType[] GetColumnFormats(string arg)
+        internal static FormatType[] GetColumnFormats(string arg)
         {
             string[] formatNames = arg.ToUpper().Split(',');
             List<FormatType> formats = new List<FormatType>();
@@ -274,25 +282,25 @@ namespace exceltowiki
             }
             return formats.ToArray();
         }
-        static void WriteError(string[] lines)
+        private static void WriteError(string[] lines)
         {
             foreach(var line in lines)
             {
                 WriteError(line);
             }
         }
-        static void WriteError()
+        private static void WriteError()
         {
             Console.Error.WriteLine();
         }
-        static void WriteError(string line, bool addLF = true)
+        private static void WriteError(string line, bool addLF = true)
         {
             if (addLF)
                 Console.Error.WriteLine(line);
             else
                 Console.Error.Write(line);
         }
-        static void Usage(string error = "")
+        internal static void Usage(string error = "")
         {
             WriteError();
             if (!String.IsNullOrEmpty(error))
@@ -304,13 +312,15 @@ namespace exceltowiki
             {
                 "Usage:",
                 "",
-                "exceltowiki [-Y] input [--columns clist] [--format flist] [--sheet sname] [--dateFormat dformat] [--headers]",
+                "exceltowiki input [--columns clist] [--format flist] [--sheet sname] [--dateFormat dformat] [--headers]",
                 "",
                 "\tinput         Path to input Excel spreadsheet file (.xls)",
                 "\t--columns     Comma separated list of column names, e.g. A,C,D,AA,B",
                 "\t--format      Comma separated list of format conversions, e.g. date,,date",
                 "\t--headers     Columns have headers",
                 "\t--date-format Format of date output on date conversion of column data",
+                "\t--help        display usage",
+                "\t--version     display version",
                 "",
                 "Where:",
                 "",
@@ -320,6 +330,12 @@ namespace exceltowiki
                 "\tdformat       Standard or custom datetime string as described in .NET Documentation. e.g. \"dd-MMM-yy\".  Default is \"g\""
             };
             WriteError(usage);
+        }
+        internal static void Version()
+        {
+            Assembly a = Assembly.GetExecutingAssembly();
+            var name = a.GetName();
+            WriteError(name.Name + " " + name.Version);
         }
     }
 }

@@ -1,0 +1,21 @@
+
+Error: Missing input file argument.
+
+Usage:
+
+exceltowiki input [--columns clist] [--format flist] [--sheet sname] [--dateFormat dformat] [--headers]
+
+	input         Path to input Excel spreadsheet file (.xls)
+	--columns     Comma separated list of column names, e.g. A,C,D,AA,B
+	--format      Comma separated list of format conversions, e.g. date,,date
+	--headers     Columns have headers
+	--date-format Format of date output on date conversion of column data
+	--help        display usage
+	--version     display version
+
+Where:
+
+	clist         Excel column list, 1 or 2 alphabetic letters in order that the columns will appear in output.
+	flist         Format list, one of date or empty string. Position in list corresponds to position in clist.
+	              date format indicates column is date/time.  Converted in output according to date-format argument
+	dformat       Standard or custom datetime string as described in .NET Documentation. e.g. "dd-MMM-yy".  Default is "g"
