@@ -7,6 +7,15 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "exceltowiki", "src\exceltow
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "src", "src", "{E941566E-9564-4CAB-82C5-B4E1EFDB2B5C}"
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "test", "test", "{D9238B42-5F0A-4B43-B909-888FA1C1781C}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "input", "input", "{CA93B6DB-14BE-4FDE-A637-B5013178869F}"
+	ProjectSection(SolutionItems) = preProject
+		test\input\API-metadata.xlsx = test\input\API-metadata.xlsx
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "output", "output", "{F41A1A89-5C4E-42CD-BB01-DB98CD79FC69}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -23,6 +32,8 @@ Global
 	EndGlobalSection
 	GlobalSection(NestedProjects) = preSolution
 		{0835138E-49D0-4DA1-99F7-C5EBCEE675AD} = {E941566E-9564-4CAB-82C5-B4E1EFDB2B5C}
+		{CA93B6DB-14BE-4FDE-A637-B5013178869F} = {D9238B42-5F0A-4B43-B909-888FA1C1781C}
+		{F41A1A89-5C4E-42CD-BB01-DB98CD79FC69} = {D9238B42-5F0A-4B43-B909-888FA1C1781C}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {09CE36E1-1FA9-48E3-9E3C-765DAB942A83}

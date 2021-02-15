@@ -29,16 +29,15 @@ namespace exceltowiki
             public string FormatParameter;
         }
 
-        static string s_inputFile = null;
-        static string s_outputFile = null;
-        static ColumnDef[] s_columns = null;
-        static WorksheetDef s_worksheet = new WorksheetDef { Index = 1 };
-        static bool s_overwrite = false;
-        static bool s_headers = false;
-        static string s_defaultDateFormat = "g";
 
         static void Main(string[] args)
         {
+            string inputFile = null;
+            WorksheetDef worksheet = new WorksheetDef { Index = 1 };
+            bool headers = false;
+            string[] columnNames = null;
+            FormatType[] columnFormats = null;
+            string dateFormat = null;
             try
             {
                 for (int i = 0; i < args.Length; ++i)
@@ -47,37 +46,31 @@ namespace exceltowiki
                     switch (arg)
                     {
                         case "--columns":
-                            s_columns = GetColumns(GetArg(args, ++i));
+                            columnNames = GetColumnNames(GetArg(args, ++i));
                             break;
                         case "--formats":
-                            GetFormats(GetArg(args, ++i), s_columns);
-                            break;
-                        case "-Y":
-                            s_overwrite = true;
+                            columnFormats = GetColumnFormats(GetArg(args, ++i));
                             break;
                         case "--headers":
-                            s_headers = true;
+                            headers = true;
                             break;
                         case "--date-format":
-                            GetDateFormat(GetArg(args, ++i), s_columns);
+                            dateFormat = GetDateFormat(GetArg(args, ++i));
                             break;
                         case "--worksheet":
-                            s_worksheet = GetWorksheet(GetArg(args, ++i));
+                            worksheet = GetWorksheet(GetArg(args, ++i));
                             break;
                         default:
                             if (String.IsNullOrEmpty(arg)) throw new ApplicationException("Null argument seen on command line.");
                             if (arg[0] == '-') throw new ApplicationException($"Unrecognized switch argument {arg} seen.");
-                            if (s_inputFile == null) s_inputFile = arg;
-                            else if (s_outputFile == null) s_outputFile = arg;
+                            if (inputFile == null) inputFile = arg;
                             else throw new ApplicationException($"Extraneous argument {arg} seen.");
                             break;
                     }
                 }
-                if (s_inputFile == null) throw new ApplicationException("Missing input file argument.");
-                if (s_outputFile == null) throw new ApplicationException("Missing output file argument.");
-                if (!File.Exists(s_inputFile)) throw new ApplicationException($"Input file '{s_inputFile}' does not exist.");
-                if (File.Exists(s_outputFile) && !s_overwrite) throw new ApplicationException($"Output file '{s_outputFile} exists and overwrite not specified.");
-                ConvertExcelToWiki(s_inputFile, s_outputFile, s_worksheet, s_columns, s_headers);
+                if (inputFile == null) throw new ApplicationException("Missing input file argument.");
+                if (!File.Exists(inputFile)) throw new ApplicationException($"Input file '{inputFile}' does not exist.");
+                ConvertExcelToWiki(inputFile, worksheet, columnNames, columnFormats, dateFormat, headers);
             }
             catch(Exception ex)
             {
@@ -85,17 +78,15 @@ namespace exceltowiki
             }
         }
 
-        private static string GetDateFormat(string arg, ColumnDef[] cds)
+        private static string GetDateFormat(string arg)
         {
-            ValidateDateFormat(arg);
-            for(int i = 0; i < cds.Length; ++i)
+            string defaultDateFormat = "g";
+            if(!String.IsNullOrEmpty(arg))
             {
-                if(cds[i].Format == FormatType.Date)
-                {
-                    cds[i].FormatParameter = arg;
-                }
+                ValidateDateFormat(arg);
+                return arg;
             }
-            return arg;
+            return defaultDateFormat;
         }
 
         private static string GetArg(string[] args, int iarg)
@@ -126,65 +117,58 @@ namespace exceltowiki
             }
         }
 
-        private static void ConvertExcelToWiki(string s_inputFile, string s_outputFile, WorksheetDef worksheetDef, ColumnDef[] columns, bool headers)
+        private static void ConvertExcelToWiki(string inputFile, WorksheetDef worksheetDef, string[] columnNames, FormatType[] columnFormats, string dateFormat, bool headers)
         {
             Microsoft.Office.Interop.Excel.Application app = new Microsoft.Office.Interop.Excel.Application();
             try
             {
-                if (File.Exists(s_outputFile)) File.Delete(s_outputFile);
-                using (FileStream outputStream = File.Open(s_outputFile, FileMode.Create, FileAccess.Write, FileShare.None))
+                TextWriter writer = Console.Out;
+                string path = inputFile;
+                if (!Path.IsPathRooted(path)) path = Path.Combine(Directory.GetCurrentDirectory(), inputFile);
+                Workbook workbook = app.Workbooks.Open(path);
+                if (workbook != null)
                 {
-                    using(StreamWriter writer = new StreamWriter(outputStream))
+                    Worksheet worksheet = workbook.Worksheets[worksheetDef.Reference];
+                    if (worksheet != null)
                     {
-                        string path = s_inputFile;
-                        if (!Path.IsPathRooted(path)) path = Path.Combine(Directory.GetCurrentDirectory(), s_inputFile);
-                        Workbook workbook = app.Workbooks.Open(path);
-                        if (workbook != null)
+                        writer.WriteLine("{| class=\"wikitable\"");
+                        int nrows = worksheet.UsedRange.Rows.Count;
+                        if (nrows == 0) throw new ApplicationException("The source table is empty.");
+                        int ncolumns = worksheet.UsedRange.Columns.Count;
+                        ColumnDef[] columns = GetColumns(ncolumns, columnNames, columnFormats, dateFormat);
+                        int irow = 1;
+                        WriteError("Writing table...");
+                        if(headers)
                         {
-                            Worksheet worksheet = workbook.Worksheets[worksheetDef.Reference];
-                            if (worksheet != null)
+                            writer.WriteLine("|+");
+                            foreach(var column in columns)
                             {
-                                writer.WriteLine("{| class=\"wikitable\"");
-                                int nrows = worksheet.UsedRange.Rows.Count;
-                                if (nrows == 0) throw new ApplicationException("The source table is empty.");
-                                int ncolumns = worksheet.UsedRange.Columns.Count;
-                                if (columns == null) columns = GetExcelColumns(ncolumns);
-                                if (ncolumns < columns.Length) throw new ApplicationException("The source table does not have enough columns");
-                                int irow = 1;
-                                Console.Write("Writing table...");
-                                if(s_headers)
-                                {
-                                    writer.WriteLine("|+");
-                                    foreach(var column in columns)
-                                    {
-                                        string s = worksheet.Cells[irow, column.Name].Value;
-                                        writer.WriteLine("|" + s);
-                                    }
-                                    irow++;
-                                }
-                                for (int r = irow; r <= nrows; ++r)
-                                {
-                                    Console.Write($"\rWriting row {r + 1} of {nrows}.");
-                                    writer.WriteLine("|-");
-                                    for (int i = 0; i < columns.Length; ++i)
-                                    {
-                                        string column = columns[i].Name;
-                                        string s = worksheet.Cells[r, column].Value;
-                                        string s1 = FormatColumn(s, columns[i]);
-                                        writer.WriteLine("|" + s1);
-                                    }
-                                }
-                                Console.WriteLine($"\rFinished writing {nrows} rows.");
-                                writer.WriteLine("|}");
+                                string s = worksheet.Cells[irow, column.Name].Value;
+                                writer.WriteLine("|" + s);
                             }
-                            else
+                            irow++;
+                        }
+                        for (int r = irow; r <= nrows; ++r)
+                        {
+                            WriteError($"\rWriting row {r + 1} of {nrows}.", false);
+                            writer.WriteLine("|-");
+                            for (int i = 0; i < columns.Length; ++i)
                             {
-                                throw new ApplicationException($"Worksheet {worksheetDef.Description} not found.");
+                                string column = columns[i].Name;
+                                string s = worksheet.Cells[r, column].Text;
+                                string s1 = FormatColumn(s, columns[i]);
+                                writer.WriteLine("|" + s1);
                             }
                         }
-                        writer.Close();
+                        WriteError($"\rFinished writing {nrows} rows.");
+                        writer.WriteLine("|}");
+                    }
+                    else
+                    {
+                        throw new ApplicationException($"Worksheet {worksheetDef.Description} not found.");
                     }
                 }
+                writer.Close();
             }
             finally
             {
@@ -192,21 +176,21 @@ namespace exceltowiki
             }
         }
 
-        private static ColumnDef[] GetExcelColumns(int ncolumns)
+        private static string[] GetExcelColumns(int ncolumns)
         {
             if (ncolumns > 26 * 26) throw new ApplicationException("Source table has too many columns.");
-            List<ColumnDef> columns = new List<ColumnDef>();
+            List<string> columns = new List<string>();
             for(int i = 0; i < ncolumns; i++)
             {
                 char a = (char)((int)'A' + i % 26);
                 if(i < 26)
                 {
-                    columns.Add(new ColumnDef { Name = new string(a, 1) , Format = FormatType.None });   
+                    columns.Add(new string(a, 1));   
                 }
                 else
                 {
                     char b = (char)((int)'A' + i / 26);
-                    columns.Add(new ColumnDef { Name = new string(new char[] { b, a }), Format = FormatType.None });
+                    columns.Add(new string(new char[] { b, a }));
                 }
             }
             return columns.ToArray();
@@ -233,15 +217,28 @@ namespace exceltowiki
                 return s;
             }
         }
-
-        private static ColumnDef[] GetColumns(string arg)
+        private static string[] GetColumnNames(string arg)
         {
             string[] columns = arg.Split(',');
-            List<ColumnDef> cds = new List<ColumnDef>();
-            foreach(var column in columns)
+            foreach (var column in columns)
             {
                 if (!IsValidExcelColumn(column)) throw new ApplicationException("Invalid Excel column seen; must be A-Z and AA-ZZ");
-                cds.Add(new ColumnDef { Name = column });
+            }
+            return columns;
+        }
+
+        private static ColumnDef[] GetColumns(int columns, string[] columnNames, FormatType[] columnFormats, string dateFormat)
+        {
+            if (columnNames == null) columnNames = GetExcelColumns(columns);
+            if (columns < columnNames.Length) throw new ApplicationException("The source table does not have enough columns");
+            List<ColumnDef> cds = new List<ColumnDef>();
+            for(int i = 0; i < columnNames.Length; ++i)
+            {
+                string name = columnNames[i];
+                FormatType type = i < columnFormats.Length ? columnFormats[i] : FormatType.None;
+                ColumnDef cd = new ColumnDef { Name = name, Format = type };
+                if (type == FormatType.Date) cd.FormatParameter = dateFormat;
+                cds.Add(cd);
             }
             return cds.ToArray();
         }
@@ -256,53 +253,73 @@ namespace exceltowiki
             else return false;
         }
 
-        private static void GetFormats(string arg, ColumnDef[] cds)
+        private static FormatType[] GetColumnFormats(string arg)
         {
-            string[] formats = arg.ToUpper().Split(',');
-            for(int i = 0; i < formats.Length; ++i)
+            string[] formatNames = arg.ToUpper().Split(',');
+            List<FormatType> formats = new List<FormatType>();
+            for(int i = 0; i < formatNames.Length; ++i)
             {
-                if (i >= cds.Length) throw new ApplicationException("More column formats than columns defined.");
-                string format = formats[i];
-                switch (format)
+                string formatName = formatNames[i];
+                switch (formatName)
                 {
                     case "":
+                        formats.Add(FormatType.None);
                         break;
                     case "DATE":
-                        cds[i].Format = FormatType.Date;
-                        cds[i].FormatParameter = s_defaultDateFormat;
+                        formats.Add(FormatType.Date);
                         break;
                     default:
                         throw new ApplicationException("Invalid formats argument");
                 }
             }
+            return formats.ToArray();
         }
-
+        static void WriteError(string[] lines)
+        {
+            foreach(var line in lines)
+            {
+                WriteError(line);
+            }
+        }
+        static void WriteError()
+        {
+            Console.Error.WriteLine();
+        }
+        static void WriteError(string line, bool addLF = true)
+        {
+            if (addLF)
+                Console.Error.WriteLine(line);
+            else
+                Console.Error.Write(line);
+        }
         static void Usage(string error = "")
         {
-            if(!String.IsNullOrEmpty(error))
+            WriteError();
+            if (!String.IsNullOrEmpty(error))
             {
-                Console.WriteLine("Error: " + error);
-                Console.WriteLine();
+                WriteError("Error: " + error);
+                WriteError();
             }
-            Console.WriteLine("Usage:");
-            Console.WriteLine();
-            Console.WriteLine("exceltowiki [-Y] input [--columns clist] [--format flist] [--sheet sname] [--dateFormat dformat] [--headers] output");
-            Console.WriteLine();
-            Console.WriteLine("\tinput       Path to input Excel spreadsheet file (.xls)");
-            Console.WriteLine("\toutput      Path to output wiki contents file (.wiki)");
-            Console.WriteLine("\t-Y          Overwrite destination file if it exists");
-            Console.WriteLine("\t--columns    Comma separated list of column names, e.g. A,C,D,AA,B");
-            Console.WriteLine("\t--format     Comma separated list of format conversions, e.g. date,,date");
-            Console.WriteLine("\t--headers    Columns have headers");
-            Console.WriteLine("\t--date-format Format of date output on date conversion of column data");
-            Console.WriteLine();
-            Console.WriteLine("Where:");
-            Console.WriteLine();
-            Console.WriteLine("\tclist       Excel column list, 1 or 2 alphabetic letters in order that the columns will appear in output.");
-            Console.WriteLine("\tflist       Format list, one of date or empty string. Position in list corresponds to position in clist.");
-            Console.WriteLine("\t            date format indicates column is date/time.  Converted in output according to date-format argument");
-            Console.WriteLine("\tdformat     Standard or custom datetime string as described in .NET Documentation. e.g. dd-MMM-yy");
-
+            string[] usage = 
+            {
+                "Usage:",
+                "",
+                "exceltowiki [-Y] input [--columns clist] [--format flist] [--sheet sname] [--dateFormat dformat] [--headers]",
+                "",
+                "\tinput         Path to input Excel spreadsheet file (.xls)",
+                "\t--columns     Comma separated list of column names, e.g. A,C,D,AA,B",
+                "\t--format      Comma separated list of format conversions, e.g. date,,date",
+                "\t--headers     Columns have headers",
+                "\t--date-format Format of date output on date conversion of column data",
+                "",
+                "Where:",
+                "",
+                "\tclist         Excel column list, 1 or 2 alphabetic letters in order that the columns will appear in output.",
+                "\tflist         Format list, one of date or empty string. Position in list corresponds to position in clist.",
+                "\t              date format indicates column is date/time.  Converted in output according to date-format argument",
+                "\tdformat       Standard or custom datetime string as described in .NET Documentation. e.g. \"dd-MMM-yy\".  Default is \"g\""
+            };
+            WriteError(usage);
         }
     }
 }
