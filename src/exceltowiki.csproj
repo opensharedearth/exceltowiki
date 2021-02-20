@@ -3,6 +3,14 @@
 <PropertyGroup>
   <OutputType>Exe</OutputType>
   <TargetFramework>netcoreapp3.1</TargetFramework>
+  <Version>2.0.0</Version>
+  <Authors>Open Shared Earth, LLC</Authors>
+  <Company>Open Shared Earth, LLC</Company>
+  <Product>Excel spreadsheet to wiki text conversion</Product>
+  <Description>This utility convert an Excel spreadsheet to a stream of wikitext which can then be included in a page on a MediaWiki site.</Description>
+  <Copyright>Copyright 2021 Open Shared Earth, LLC</Copyright>
+  <PackageLicenseExpression>MIT</PackageLicenseExpression>
+  <PackageIcon>exceltowiki.png</PackageIcon>
 </PropertyGroup>
 
 <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
@@ -12,6 +20,15 @@
 <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
   <OutputPath>..\bin\Debug</OutputPath>
 </PropertyGroup>
+
+<ItemGroup>
+  <None Remove="images\exceltowiki.ico" />
+  <None Remove="images\exceltowiki.ico" />
+  <None Include="C:\Users\rundl\OneDrive\OSE\Development\Icons\exceltowiki.png">
+    <Pack>True</Pack>
+    <PackagePath></PackagePath>
+  </None>
+</ItemGroup>
 
 <ItemGroup>
   <PackageReference Include="DocumentFormat.OpenXml" Version="2.12.1" />

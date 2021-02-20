@@ -11,6 +11,8 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "test", "test", "{D9238B42-5
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "exceltowiki.Test", "test\exceltowiki.Test.csproj", "{19FA63C3-921E-42BD-9179-5D0B590936B5}"
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Images", "Images", "{D25B33CE-4DC8-4F1C-AD68-F53B23C81CFB}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -32,6 +34,7 @@ Global
 	GlobalSection(NestedProjects) = preSolution
 		{0835138E-49D0-4DA1-99F7-C5EBCEE675AD} = {E941566E-9564-4CAB-82C5-B4E1EFDB2B5C}
 		{19FA63C3-921E-42BD-9179-5D0B590936B5} = {D9238B42-5F0A-4B43-B909-888FA1C1781C}
+		{D25B33CE-4DC8-4F1C-AD68-F53B23C81CFB} = {E941566E-9564-4CAB-82C5-B4E1EFDB2B5C}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {09CE36E1-1FA9-48E3-9E3C-765DAB942A83}
