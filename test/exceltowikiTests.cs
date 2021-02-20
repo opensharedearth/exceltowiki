@@ -49,9 +49,9 @@ namespace exceltowiki.Test
         {
             string file = "basic.wiki";
             string test = _fixture.GetTempFilePath(file);
-            Console.SetError(new StreamWriter(test));
+            Console.SetOut(new StreamWriter(test));
             Program.Main(new string[] { @"input\API-metadata.xlsx" });
-            Console.Error.Close();
+            Console.Out.Close();
             Assert.True(_fixture.CompareFiles(_fixture.GetOutputFilePath(file), test));
         }
     }

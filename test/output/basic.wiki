@@ -1,0 +1,465 @@
+{| class="wikitable"
+|-
+|Organization ID
+|Asset ID
+|Language Code
+|Active Resolver Link
+|Asset Resolver Link
+|Asset Status
+|Asset Type
+|Committee Sponsor
+|Content Type
+|Date Replaced
+|Date Withdrawn
+|Description
+|Digital Format
+|Document Status
+|Document Subtitle
+|Document Title
+|DOI
+|Document Title
+|Ingest Date
+|Ingest User
+|ISSN
+|Issue
+|Main Asset
+|Main Committee
+|ML Asset UUID
+|Page Count
+|Preview First Page
+|Preview Last Page
+|Preview Link
+|Price
+|Print Format
+|Prior Version
+|Product Code
+|Public Comment
+|Published Link
+|Published My ASTM Link
+|Published Public Link
+|Publisher Name
+|Referenced
+|Referenced By
+|Related Asset
+|Release Date
+|Replaced By
+|Sub Committee
+|Supplement Type
+|Volume
+|Watermarking
+|Web Display Name
+|Workflow Status
+|-
+|API
+|ANSI/API SPEC 10A 25TH ED (A1)
+|en-US
+|https://www.astm.org/cgi-bin/resolver.cgi?3PC+API+ANSI/API_SPEC_10A+en-US
+|https://www.astm.org/cgi-bin/resolver.cgi?3PC+API+ANSI/API%20SPEC%2010A%2025TH%20ED%20(A1)+en-US
+|Active
+|Third-Party Content
+|
+|Monogram Standard
+|
+|
+|<p><b>1 Scope </b></p><p><b>1.1 General </b></p><p>This document specifies requirements and gives recommendations for six classes of well cements, and two classes of composite well cements including their chemical and physical requirements, and procedures for physical testing. </p><p> This specification is applicable to well cement classes A, B, C, and D, which are the products obtained by grinding Portland cement clinker and, if needed, calcium sulfate (CaSO4) as an interground additive. Processing additives can be used in the manufacture of cement of these classes. Suitable set-modifying agents can be interground or blended during the manufacture of Class D cement. Annex B describes composite well cement classes K and L, which are the products obtained by intergrinding Portland cement clinker and one or more forms of CaSO4 with composite constituents, or by subsequent blending of separately produced Portland cement with separately processed composite constituents. Composite constituents are also specified in Annex B. </p><p> This specification is also applicable to well cement classes G and H, which are the products obtained by grinding clinker with no additives other than one or more forms of CaSO4, water, or chemical additives as required for chromium (VI) reduction. </p><p><b>1.2 Application of the API Monogram </b></p><p>When product is manufactured at a facility licensed by API and is intended to be supplied bearing the API Monogram, the requirements of Annex A shall apply. </p><p><b>1.3 Use of Metric SI and US Customary Units</b></p><p>This document contains metric SI and US customary oilfield units. For the purposes of this document, the conversion between the systems is not exact and has been intentionally rounded to allow for ease of use in calibration and measurement.</p>
+|true
+|
+|
+|Specification for Cements and Materials for Well Cementing; Twenty-Fifth Edition; Effective Date: September 2019
+|
+|ANSI/API_SPEC_10A
+|2019-12-02T14:03:54.291904-05:00
+|a3pc-autoloader
+|
+|
+|
+|
+|82493435-f281-45d8-af82-07ad8131cb56
+|76
+|1
+|6
+|http://compass.astm.org/DIGITAL_LIBRARY/3PC.PREVIEW/82493435-f281-45d8-af82-07ad8131cb56.htm
+|172.00
+|true
+|ANSI/API SPEC 10A 25TH ED (2019)
+|GX10A25_002
+|
+|http://compass.astm.org/DIGITAL_LIBRARY/3PC/82493435-f281-45d8-af82-07ad8131cb56.htm
+|
+|
+|American Petroleum Institute
+|
+|
+|
+|2019-03-01
+|
+|
+|
+|
+|true
+|
+|Published
+|-
+|API
+|ANSI/API SPEC 10D 6TH ED (R 2015)
+|en-US
+|https://www.astm.org/cgi-bin/resolver.cgi?3PC+API+ANSI/API_SPEC_10D+en-US
+|https://www.astm.org/cgi-bin/resolver.cgi?3PC+API+ANSI/API%20SPEC%2010D%206TH%20ED%20(R%202015)+en-US
+|Active
+|Third-Party Content
+|
+|Monogram Standard
+|
+|
+|<p>This standard provides minimum performance requirements, test procedures and marking requirements for bow-spring casing centralizers for the petroleum and natural gas industries. The requirements contained herein are limited, but are deemed adequate for use in oil field cementing. The procedures provide verification testing for the manufacturer's design, materials and process specifications, and periodic testing to confirm the consistency of product performance.</p><p>This standard is not applicable to rigid or positive centralizers.</p>
+|true
+|
+|
+|Specification for Bow-string Casing Centralizers; Sixth Edition; Effective Date: September 1, 2002; Reaffirmed, April 2015
+|
+|ANSI/API_SPEC_10D
+|2016-07-18T15:27:46.701528-04:00
+|a3pc-autoloader
+|
+|
+|
+|
+|d4b92571-9ad0-4253-a96f-c64e041dc9fc
+|25
+|1
+|8
+|http://compass.astm.org/DIGITAL_LIBRARY/3PC/d4b92571-9ad0-4253-a96f-c64e041dc9fc.htm
+|97.00
+|true
+|
+|GX10D06_001
+|
+|http://compass.astm.org/DIGITAL_LIBRARY/3PC/d4b92571-9ad0-4253-a96f-c64e041dc9fc.htm
+|
+|
+|American Petroleum Institute
+|
+|
+|
+|2015-04-01
+|
+|
+|
+|
+|true
+|
+|Published
+|-
+|API
+|ANSI/API SPEC 11D1 2ND ED (2009)
+|en-US
+|https://www.astm.org/cgi-bin/resolver.cgi?3PC+API+ANSI/API_SPEC_11D1+en-US
+|https://www.astm.org/cgi-bin/resolver.cgi?3PC+API+ANSI/API%20SPEC%2011D1%202ND%20ED%20(2009)+en-US
+|Historical
+|Third-Party Content
+|
+|Monogram Standard
+|
+|
+|<p>This International Standard provides requirements and guidelines for packers and bridge plugs as defined herein for use in the petroleum and natural gas industry. This International Standard provides requirements for the functional specification and technical specification, including design, design verification and validation,  materials, documentation and data control, repair, shipment, and storage. In addition, products covered by this  International Standard apply only to applications within a conduit. Installation and maintenance of these products are outside the scope of this International Standard.</p>
+|true
+|
+|
+|Packers and Bridge Plugs; Second Edition; Effective Date: January 1, 2010
+|
+|ANSI/API_SPEC_11D1
+|2016-02-10T16:05:30.420747-05:00
+|a3pc-autoloader
+|
+|
+|
+|
+|18dae076-9b8a-4881-a235-d85e20034729
+|42
+|1
+|7
+|http://compass.astm.org/DIGITAL_LIBRARY/3PC/18dae076-9b8a-4881-a235-d85e20034729.htm
+|140.00
+|true
+|
+|GG11D12_001
+|
+|http://compass.astm.org/DIGITAL_LIBRARY/3PC/18dae076-9b8a-4881-a235-d85e20034729.htm
+|
+|
+|American Petroleum Institute
+|
+|
+|
+|2009-07-01
+|
+|
+|
+|
+|true
+|
+|Published
+|-
+|API
+|ANSI/API SPEC 11D1 3RD ED (2015)
+|en-US
+|https://www.astm.org/cgi-bin/resolver.cgi?3PC+API+ANSI/API_SPEC_11D1+en-US
+|https://www.astm.org/cgi-bin/resolver.cgi?3PC+API+ANSI/API%20SPEC%2011D1%203RD%20ED%20(2015)+en-US
+|Historical
+|Third-Party Content
+|
+|Monogram Standard
+|
+|
+|<p>This specification provides requirements and guidelines for packers and 
+bridge plugs as defined herein for use in the petroleum and natural gas industry. This specification provides 
+requirements for the functional 
+specification and technical specification, including design, design verification 
+and validation, materials, 
+documentation and data control, repair, shipment, and storage. In addition, 
+products covered by this 
+specification apply only to applications within a conduit. Installation and 
+maintenance of these products are 
+outside the scope of this specification.</p>
+<p>This specification includes the following annexes:</p>
+<p>&#8212; Annex A: Use of API Monogram by Licensees;</p>
+<p>&#8212; Annex B: Requirements for HPHT Environment Equipment;</p>
+<p>&#8212; Annex C: Requirements for HPHT Environment Operational Tools;</p>
+<p>&#8212; Annex D: External Flow Testing Requirements.</p>
+|true
+|
+|
+|Packers and Bridge Plugs; Third Edition; ISO 14310:2008
+|
+|ANSI/API_SPEC_11D1
+|2016-02-10T16:05:30.420747-05:00
+|a3pc-autoloader
+|
+|
+|
+|CSOEM
+|4828a454-0fea-451b-a61b-18304836ea91
+|72
+|1
+|8
+|http://compass.astm.org/DIGITAL_LIBRARY/3PC.PREVIEW/4828a454-0fea-451b-a61b-18304836ea91.htm
+|124.00
+|true
+|ANSI/API SPEC 11D1 2ND ED (2009)
+|G11D103_001
+|
+|http://compass.astm.org/DIGITAL_LIBRARY/3PC/4828a454-0fea-451b-a61b-18304836ea91.htm
+|
+|
+|American Petroleum Institute
+|
+|
+|
+|2015-04-01
+|
+|
+|
+|
+|true
+|
+|Published
+|-
+|API
+|ANSI/API SPEC 11D1 3RD ED (E1)
+|en-US
+|https://www.astm.org/cgi-bin/resolver.cgi?3PC+API+ANSI/API_SPEC_11D1+en-US
+|https://www.astm.org/cgi-bin/resolver.cgi?3PC+API+ANSI/API%20SPEC%2011D1%203RD%20ED%20(E1)+en-US
+|Active
+|Third-Party Content
+|
+|Monogram Standard
+|
+|
+|<p>1 Scope</p><p>This specification provides requirements and guidelines for packers and bridge plugs as defined herein for use in the petroleum and natural gas industry. This specification provides requirements for the functional specification and technical specification, including design, design verification and validation, materials, documentation and data control, repair, shipment, and storage. In addition, products covered by this specification apply only to applications within a conduit. Installation and maintenance of these products are outside the scope of this specification. </p><p>This specification includes the following annexes: <ul><li>Annex A: Use of API Monogram by Licensees;</li> <li>Annex B: Requirements for HPHT Environment Equipment; </li> <li>Annex C: Requirements for HPHT Environment Operational Tools; </li> <li>Annex D: External Flow Testing Requirements. </li></ul>
+|true
+|
+|
+|Packers and Bridge Plugs; Third Edition; ISO 14310:2008
+|
+|ANSI/API_SPEC_11D1
+|2019-08-21T13:32:55.449512-04:00
+|a3pc-autoloader
+|
+|
+|
+|CSOEM
+|b0401c20-05da-4deb-b94b-edbfd3160962
+|73
+|1
+|8
+|http://compass.astm.org/DIGITAL_LIBRARY/3PC.PREVIEW/b0401c20-05da-4deb-b94b-edbfd3160962.htm
+|124.00
+|true
+|ANSI/API SPEC 11D1 3RD ED (2015)
+|G11D103_002
+|
+|http://compass.astm.org/DIGITAL_LIBRARY/3PC/b0401c20-05da-4deb-b94b-edbfd3160962.htm
+|
+|
+|American Petroleum Institute
+|
+|
+|
+|2015-04-01
+|
+|
+|
+|
+|true
+|
+|Published
+|-
+|API
+|ANSI/API SPEC 13A 18TH ED (2010)
+|en-US
+|https://www.astm.org/cgi-bin/resolver.cgi?3PC+API+ANSI/API_SPEC_13A+en-US
+|https://www.astm.org/cgi-bin/resolver.cgi?3PC+API+ANSI/API%20SPEC%2013A%2018TH%20ED%20(2010)+en-US
+|Historical
+|Third-Party Content
+|
+|Monogram Standard
+|
+|
+|<p>This International Standard covers physical properties and test procedures for materials manufactured for use in oil- and gas-well drilling fluids. The materials covered are barite, haematite, bentonite, nontreated bentonite, OCMA-grade bentonite, attapulgite, sepiolite, technical-grade low-viscosity carboxymethylcellulose (CMC-LVT), technical-grade high-viscosity carboxymethylcellulose (CMC-HVT), starch, low-viscosity polyanionic cellulose (PAC-LV), high-viscosity polyanionic cellulose (PAC-HV), drilling-grade Xanthan gum, and barite 4,1. This International Standard is intended for the use of manufacturers of named products.</p>
+|true
+|
+|
+|Specification for Drilling Fluids Materials; Eighteenth Edition
+|
+|ANSI/API_SPEC_13A
+|2016-02-10T16:05:30.420747-05:00
+|a3pc-autoloader
+|
+|
+|
+|CSOEM
+|9e5d94fd-1ee1-49fe-a836-e4fbf3df5d72
+|128
+|1
+|14
+|http://compass.astm.org/DIGITAL_LIBRARY/3PC/9e5d94fd-1ee1-49fe-a836-e4fbf3df5d72.htm
+|196.00
+|true
+|
+|GX13A018_001
+|
+|http://compass.astm.org/DIGITAL_LIBRARY/3PC/9e5d94fd-1ee1-49fe-a836-e4fbf3df5d72.htm
+|
+|
+|American Petroleum Institute
+|
+|
+|
+|2010-02-01
+|
+|
+|
+|
+|true
+|
+|Published
+|-
+|API
+|ANSI/API SPEC 13A 18TH ED (E1)
+|en-US
+|https://www.astm.org/cgi-bin/resolver.cgi?3PC+API+ANSI/API_SPEC_13A+en-US
+|https://www.astm.org/cgi-bin/resolver.cgi?3PC+API+ANSI/API%20SPEC%2013A%2018TH%20ED%20(E1)+en-US
+|Historical
+|Third-Party Content
+|
+|Monogram Standard
+|
+|
+|<p>This International Standard covers physical properties and test procedures for materials manufactured for use in oil- and gas-well drilling fluids. The materials covered are barite, haematite, bentonite, nontreated bentonite, OCMA-grade bentonite, attapulgite, sepiolite, technical-grade low-viscosity carboxymethylcellulose (CMC-LVT), technical-grade high-viscosity carboxymethylcellulose (CMC-HVT), starch, low-viscosity polyanionic cellulose (PAC-LV), high-viscosity polyanionic cellulose (PAC-HV), drilling-grade Xanthan gum, and barite 4,1. This International Standard is intended for the use of manufacturers of named products.</p>
+|true
+|
+|
+|Specification for Drilling Fluids Materials; Eighteenth Edition
+|
+|ANSI/API_SPEC_13A
+|2016-02-10T16:05:30.420747-05:00
+|a3pc-autoloader
+|
+|
+|
+|CSOEM
+|e05d3152-d19b-4f40-bdec-679816fcc835
+|128
+|1
+|12
+|http://compass.astm.org/DIGITAL_LIBRARY/3PC/e05d3152-d19b-4f40-bdec-679816fcc835.htm
+|196.00
+|true
+|ANSI/API SPEC 13A 18TH ED (2010)
+|GX13A018_002
+|
+|http://compass.astm.org/DIGITAL_LIBRARY/3PC/e05d3152-d19b-4f40-bdec-679816fcc835.htm
+|
+|
+|American Petroleum Institute
+|
+|
+|
+|2010-02-01
+|
+|
+|
+|
+|true
+|
+|Published
+|-
+|API
+|ANSI/API SPEC 13A 18TH ED (E1) (E2)
+|en-US
+|https://www.astm.org/cgi-bin/resolver.cgi?3PC+API+ANSI/API_SPEC_13A+en-US
+|https://www.astm.org/cgi-bin/resolver.cgi?3PC+API+ANSI/API%20SPEC%2013A%2018TH%20ED%20(E1)%20(E2)+en-US
+|Historical
+|Third-Party Content
+|
+|Monogram Standard
+|
+|
+|<p>This International Standard covers physical properties and test procedures for materials manufactured for use in oil- and gas-well drilling fluids. The materials covered are barite, haematite, bentonite, nontreated bentonite, OCMA-grade bentonite, attapulgite, sepiolite, technical-grade low-viscosity carboxymethylcellulose (CMC-LVT), technical-grade high-viscosity carboxymethylcellulose (CMC-HVT), starch, low-viscosity polyanionic cellulose (PAC-LV), high-viscosity polyanionic cellulose (PAC-HV), drilling-grade Xanthan gum, and barite 4,1. This International Standard is intended for the use of manufacturers of named products.</p>
+|true
+|
+|
+|Specification for Drilling Fluids Materials; Eighteenth Edition
+|
+|ANSI/API_SPEC_13A
+|2016-02-10T16:05:30.420747-05:00
+|a3pc-autoloader
+|
+|
+|
+|CSOEM
+|8f3a0193-35c1-40e1-b5b6-5abc1b968169
+|126
+|1
+|12
+|http://compass.astm.org/DIGITAL_LIBRARY/3PC/8f3a0193-35c1-40e1-b5b6-5abc1b968169.htm
+|196.00
+|true
+|ANSI/API SPEC 13A 18TH ED (E1)
+|GX13A018_003
+|
+|http://compass.astm.org/DIGITAL_LIBRARY/3PC/8f3a0193-35c1-40e1-b5b6-5abc1b968169.htm
+|
+|
+|American Petroleum Institute
+|
+|
+|
+|2010-02-01
+|
+|
+|
+|
+|true
+|
+|Published

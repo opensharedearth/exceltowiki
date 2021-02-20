@@ -1,0 +1,9 @@
+{
+  "profiles": {
+    "exceltowiki2": {
+      "commandName": "Project",
+      "commandLineArgs": "\"API-metadata-for SPE_12-08-20 ver 2.5.xlsx\" --columns \"B,P,L,AC,AP\" --formats \",,,,date\" --headers --date-format dd-MMM-yy >api.wiki",
+      "workingDirectory": "C:\\Users\\rundl\\OneDrive\\SPE\\PetroWiki\\API metadata"
+    }
+  }
+}

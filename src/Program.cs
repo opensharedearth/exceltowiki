@@ -1,12 +1,15 @@
-﻿using Microsoft.Office.Interop.Excel;
+﻿using DocumentFormat.OpenXml.Packaging;
+using DocumentFormat.OpenXml.Spreadsheet;
 using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Reflection;
+using System.Runtime.CompilerServices;
 using System.Text;
 using System.Threading.Tasks;
 
+[assembly: InternalsVisibleTo("exceltowiki.Test")]
 namespace exceltowiki
 {
     public class Program
@@ -17,6 +20,7 @@ namespace exceltowiki
             public string Name;
             public object Reference => Name == null ? (object)Index : Name;
             public string Description => Name == null ? Index.ToString() : Name;
+            public bool HasName => Name != null;
         };
         internal enum FormatType
         {
@@ -79,7 +83,7 @@ namespace exceltowiki
                 if (!File.Exists(inputFile)) throw new ApplicationException($"Input file '{inputFile}' does not exist.");
                 ConvertExcelToWiki(inputFile, worksheet, columnNames, columnFormats, dateFormat, headers);
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
                 Usage(ex.Message);
             }
@@ -88,7 +92,7 @@ namespace exceltowiki
         internal static string GetDateFormat(string arg)
         {
             string defaultDateFormat = "g";
-            if(!String.IsNullOrEmpty(arg))
+            if (!String.IsNullOrEmpty(arg))
             {
                 ValidateDateFormat(arg);
                 return arg;
@@ -118,7 +122,7 @@ namespace exceltowiki
                 string s = DateTime.Now.ToString(arg);
                 return true;
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
                 throw new ApplicationException("Invalid date format argument", ex);
             }
@@ -126,77 +130,105 @@ namespace exceltowiki
 
         internal static void ConvertExcelToWiki(string inputFile, WorksheetDef worksheetDef, string[] columnNames, FormatType[] columnFormats, string dateFormat, bool headers)
         {
-            Microsoft.Office.Interop.Excel.Application app = new Microsoft.Office.Interop.Excel.Application();
             try
             {
                 TextWriter writer = Console.Out;
                 string path = inputFile;
                 if (!Path.IsPathRooted(path)) path = Path.Combine(Directory.GetCurrentDirectory(), inputFile);
-                Workbook workbook = app.Workbooks.Open(path);
-                if (workbook != null)
+                using (SpreadsheetDocument doc = SpreadsheetDocument.Open(path, false))
                 {
-                    Worksheet worksheet = workbook.Worksheets[worksheetDef.Reference];
-                    if (worksheet != null)
+                    Sheets sheets = doc.WorkbookPart.Workbook.GetFirstChild<Sheets>();
+                    SharedStringTable sst = doc.WorkbookPart.SharedStringTablePart.SharedStringTable;
+                    Worksheet worksheet = FindWorksheet(doc.WorkbookPart, sheets, worksheetDef);
+                    SheetData sheetData = worksheet.GetFirstChild<SheetData>() as SheetData;
+                    SharedStrings ss = new SharedStrings(sst);
+                    if (sheetData != null)
                     {
-                        writer.WriteLine("{| class=\"wikitable\"");
-                        int nrows = worksheet.UsedRange.Rows.Count;
-                        if (nrows == 0) throw new ApplicationException("The source table is empty.");
-                        int ncolumns = worksheet.UsedRange.Columns.Count;
-                        ColumnDef[] columns = GetColumns(ncolumns, columnNames, columnFormats, dateFormat);
-                        int irow = 1;
                         WriteError("Writing table...");
-                        if(headers)
+                        writer.WriteLine("{| class=\"wikitable\"");
+                        SheetDimension dimension = worksheet.GetFirstChild<SheetDimension>() as SheetDimension;
+                        CellRange usedRange = new CellRange(dimension.Reference.Value);
+                        int nrows = usedRange.GetRowCount();
+                        int ncolumns = usedRange.GetColumnCount();
+                        if (nrows == 0) throw new ApplicationException("The source table is empty.");
+                        ColumnDef[] columns = GetColumns(ncolumns, columnNames, columnFormats, dateFormat);
+                        int rowIndex = 0;
+                        foreach(Row row in sheetData)
                         {
-                            writer.WriteLine("|+");
-                            foreach(var column in columns)
+                            TableRow tr = new TableRow(row, ss);
+                            if(headers && rowIndex == 0)
                             {
-                                string s = worksheet.Cells[irow, column.Name].Value;
-                                writer.WriteLine("|" + s);
+                                writer.WriteLine("|+");
+                                foreach(var column in columnNames)
+                                {
+                                    string s = tr[column].ToString();
+                                    writer.WriteLine("|" + s);
+                                }
                             }
-                            irow++;
-                        }
-                        for (int r = irow; r <= nrows; ++r)
-                        {
-                            WriteError($"\rWriting row {r + 1} of {nrows}.", false);
-                            writer.WriteLine("|-");
-                            for (int i = 0; i < columns.Length; ++i)
+                            else
                             {
-                                string column = columns[i].Name;
-                                string s = worksheet.Cells[r, column].Text;
-                                string s1 = FormatColumn(s, columns[i]);
-                                writer.WriteLine("|" + s1);
+                                WriteError($"\rWriting row {rowIndex + 1} of {nrows}.", false);
+                                writer.WriteLine("|-");
+                                for (int i = 0; i < columns.Length; ++i)
+                                {
+                                    string column = columns[i].Name;
+                                    string s = tr[column].ToString();
+                                    string s1 = FormatColumn(s, columns[i]);
+                                    writer.WriteLine("|" + s1);
+                                }
                             }
+                            rowIndex++;
                         }
-                        WriteError($"\rFinished writing {nrows} rows.");
-                        writer.WriteLine("|}");
-                    }
-                    else
-                    {
-                        throw new ApplicationException($"Worksheet {worksheetDef.Description} not found.");
                     }
                 }
-                writer.Close();
             }
-            finally
+            catch(Exception ex)
             {
-                app.Quit();
+
             }
+        }
+
+
+        private static Worksheet FindWorksheet(WorkbookPart workbookPart, Sheets sheets, WorksheetDef wd)
+        {
+            Sheet sheet = null;
+            if(wd.HasName)
+            {
+                foreach(var s in sheets.ChildElements.OfType<Sheet>())
+                {
+                    if (s.Name == wd.Name)
+                    {
+                        sheet = s;
+                        break;
+                    }
+                }
+            }
+            else if(wd.Index <= sheets.Count())
+            {
+                sheet = sheets.ChildElements[wd.Index - 1] as Sheet;
+            }
+            if(sheet != null)
+            {
+                Worksheet worksheet = ((WorksheetPart)workbookPart.GetPartById(sheet.Id)).Worksheet;
+                return worksheet;
+            }
+            return null;
         }
 
         internal static string[] GetExcelColumns(int ncolumns)
         {
             if (ncolumns > 26 * 26) throw new ApplicationException("Source table has too many columns.");
             List<string> columns = new List<string>();
-            for(int i = 0; i < ncolumns; i++)
+            for (int i = 0; i < ncolumns; i++)
             {
                 char a = (char)((int)'A' + i % 26);
-                if(i < 26)
+                if (i < 26)
                 {
-                    columns.Add(new string(a, 1));   
+                    columns.Add(new string(a, 1));
                 }
                 else
                 {
-                    char b = (char)((int)'A' + i / 26);
+                    char b = (char)('A' - 1 + i / 26);
                     columns.Add(new string(new char[] { b, a }));
                 }
             }
@@ -215,7 +247,7 @@ namespace exceltowiki
 
         internal static string FormatDate(string s, string dateFormat)
         {
-            if(DateTime.TryParse(s, out DateTime v))
+            if (DateTime.TryParse(s, out DateTime v))
             {
                 return v.ToString(dateFormat);
             }
@@ -240,7 +272,7 @@ namespace exceltowiki
             if (columnFormats == null) columnFormats = new FormatType[0];
             if (columns < columnNames.Length) throw new ApplicationException("The source table does not have enough columns");
             List<ColumnDef> cds = new List<ColumnDef>();
-            for(int i = 0; i < columnNames.Length; ++i)
+            for (int i = 0; i < columnNames.Length; ++i)
             {
                 string name = columnNames[i];
                 FormatType type = i < columnFormats.Length ? columnFormats[i] : FormatType.None;
@@ -265,7 +297,7 @@ namespace exceltowiki
         {
             string[] formatNames = arg.ToUpper().Split(',');
             List<FormatType> formats = new List<FormatType>();
-            for(int i = 0; i < formatNames.Length; ++i)
+            for (int i = 0; i < formatNames.Length; ++i)
             {
                 string formatName = formatNames[i];
                 switch (formatName)
@@ -284,7 +316,7 @@ namespace exceltowiki
         }
         private static void WriteError(string[] lines)
         {
-            foreach(var line in lines)
+            foreach (var line in lines)
             {
                 WriteError(line);
             }
@@ -308,7 +340,7 @@ namespace exceltowiki
                 WriteError("Error: " + error);
                 WriteError();
             }
-            string[] usage = 
+            string[] usage =
             {
                 "Usage:",
                 "",
