@@ -3,7 +3,7 @@ using System;
 using System.Collections.Generic;
 using System.Text;
 
-namespace exceltowiki
+namespace ExcelAdaptor
 {
     public class SharedString
     {

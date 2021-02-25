@@ -1,5 +1,6 @@
 ﻿using DocumentFormat.OpenXml.Packaging;
 using DocumentFormat.OpenXml.Spreadsheet;
+using ExcelAdaptor;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -135,33 +136,26 @@ namespace exceltowiki
                 TextWriter writer = Console.Out;
                 string path = inputFile;
                 if (!Path.IsPathRooted(path)) path = Path.Combine(Directory.GetCurrentDirectory(), inputFile);
-                using (SpreadsheetDocument doc = SpreadsheetDocument.Open(path, false))
+                using (WorkbookAdaptor workbook = WorkbookAdaptor.Open(path, true))
                 {
-                    Sheets sheets = doc.WorkbookPart.Workbook.GetFirstChild<Sheets>();
-                    SharedStringTable sst = doc.WorkbookPart.SharedStringTablePart.SharedStringTable;
-                    Worksheet worksheet = FindWorksheet(doc.WorkbookPart, sheets, worksheetDef);
-                    SheetData sheetData = worksheet.GetFirstChild<SheetData>() as SheetData;
-                    SharedStrings ss = new SharedStrings(sst);
-                    if (sheetData != null)
+                    WorksheetAdaptor worksheet = workbook.GetWorksheet(worksheetDef.Reference);
+                    if (worksheet != null)
                     {
+
                         WriteError("Writing table...");
                         writer.WriteLine("{| class=\"wikitable\"");
-                        SheetDimension dimension = worksheet.GetFirstChild<SheetDimension>() as SheetDimension;
-                        CellRange usedRange = new CellRange(dimension.Reference.Value);
-                        int nrows = usedRange.GetRowCount();
-                        int ncolumns = usedRange.GetColumnCount();
+                        int nrows = worksheet.RowCount;
+                        int ncolumns = worksheet.ColumnCount;
                         if (nrows == 0) throw new ApplicationException("The source table is empty.");
                         ColumnDef[] columns = GetColumns(ncolumns, columnNames, columnFormats, dateFormat);
-                        int rowIndex = 0;
-                        foreach(Row row in sheetData)
+                        for (int rowIndex = 1; rowIndex <= nrows; ++rowIndex)
                         {
-                            TableRow tr = new TableRow(row, ss);
-                            if(headers && rowIndex == 0)
+                            if (headers && rowIndex == 1)
                             {
                                 writer.WriteLine("|+");
-                                foreach(var column in columnNames)
+                                foreach (var column in columnNames)
                                 {
-                                    string s = tr[column].ToString();
+                                    string s = worksheet.Cells(rowIndex, column).ToString();
                                     writer.WriteLine("|" + s);
                                 }
                             }
@@ -172,47 +166,23 @@ namespace exceltowiki
                                 for (int i = 0; i < columns.Length; ++i)
                                 {
                                     string column = columns[i].Name;
-                                    string s = tr[column].ToString();
+                                    string s = worksheet.Cells(rowIndex, column).ToString();
                                     string s1 = FormatColumn(s, columns[i]);
                                     writer.WriteLine("|" + s1);
                                 }
                             }
-                            rowIndex++;
                         }
                     }
-                }
-            }
-            catch(Exception ex)
-            {
-
-            }
-        }
-
-
-        private static Worksheet FindWorksheet(WorkbookPart workbookPart, Sheets sheets, WorksheetDef wd)
-        {
-            Sheet sheet = null;
-            if(wd.HasName)
-            {
-                foreach(var s in sheets.ChildElements.OfType<Sheet>())
-                {
-                    if (s.Name == wd.Name)
+                    else
                     {
-                        sheet = s;
-                        break;
+                        throw new ApplicationException("Worksheet not found");
                     }
                 }
             }
-            else if(wd.Index <= sheets.Count())
+            catch (Exception ex)
             {
-                sheet = sheets.ChildElements[wd.Index - 1] as Sheet;
+                throw new ApplicationException("Unable to convert excel to wiki", ex);
             }
-            if(sheet != null)
-            {
-                Worksheet worksheet = ((WorksheetPart)workbookPart.GetPartById(sheet.Id)).Worksheet;
-                return worksheet;
-            }
-            return null;
         }
 
         internal static string[] GetExcelColumns(int ncolumns)

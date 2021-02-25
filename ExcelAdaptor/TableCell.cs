@@ -4,15 +4,15 @@ using System;
 using System.Collections.Generic;
 using System.Text;
 
-namespace exceltowiki
+namespace ExcelAdaptor
 {
     public class TableCell
     {
         public static TableCell Null = new TableCell();
-        CellReference _reference;
-        Cell _cell = null;
-        CellValues _dataType = CellValues.Error;
-        CellValue _value = null;
+        public CellReference Reference { get; private set; } = null;
+        public Cell Cell { get; private set; } = null;
+        public CellValues DataType { get; private set; } = CellValues.Error;
+        public CellValue CellValue { get; private set; } = null;
         SharedStrings _sst = null;
         public TableCell()
         {
@@ -20,31 +20,31 @@ namespace exceltowiki
         }
         public TableCell(Cell cell, SharedStrings sst = null)
         {
-            _cell = cell;
-            _reference = new CellReference(cell.CellReference.Value);
+            Cell = cell;
+            Reference = new CellReference(cell.CellReference.Value);
             if((object)cell.DataType == null)
             {
-                _dataType = CellValues.Number;
+                DataType = CellValues.Number;
             }
             else
             {
-                _dataType = cell.DataType;
+                DataType = cell.DataType;
             }
-            _value = cell.CellValue;
+            CellValue = cell.CellValue;
             _sst = sst;
         }
         public object Value
         {
             get
             {
-                if(_value != null)
+                if(CellValue != null)
                 {
-                    switch (_dataType)
+                    switch (DataType)
                     {
                         case CellValues.SharedString:
-                            return _sst != null ? _sst[_value.Text] : (object)"";
+                            return _sst != null ? _sst[CellValue.Text] : (object)"";
                         default:
-                            return _value.Text;
+                            return CellValue.Text;
                     }
                 }
                 else
@@ -53,12 +53,13 @@ namespace exceltowiki
                 }
             }
         }
-        public int RowIndex => _reference.Row;
-        public int ColumnIndex => _reference.ColumnIndex;
-        public string Column => _reference.Column;
+        public int RowIndex => Reference.Row;
+        public int ColumnIndex => Reference.ColumnIndex;
+        public string Column => Reference.Column;
         public override string ToString()
         {
             return Value.ToString();
         }
+        public bool IsNull => Reference == CellReference.Null;
     }
 }
