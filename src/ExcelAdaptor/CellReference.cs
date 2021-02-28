@@ -80,11 +80,13 @@ namespace ExcelAdaptor
         }
         public static bool operator==(CellReference cref0, CellReference cref1)
         {
-            return cref0.Equals(cref1);
+            if ((Object)cref0 == null) return (Object)cref1 == null;
+            else return cref0.Equals(cref1);
         }
         public static bool operator !=(CellReference cref0, CellReference cref1)
         {
-            return !cref0.Equals(cref1);
+            if ((Object)cref0 == null) return (Object)cref1 != null;
+            else return !cref0.Equals(cref1);
         }
         public static int GetColumnIndex(string columnName)
         {
@@ -108,10 +110,14 @@ namespace ExcelAdaptor
         public int ColumnIndex => GetColumnIndex(Column);
         public static bool operator<(CellReference cref0, CellReference cref1)
         {
-            return cref0.ColumnIndex < cref1.ColumnIndex || (cref0.Column == cref1.Column && cref0.Row < cref1.Row);
+            if ((Object)cref0 == null) return (Object)cref1 != null;
+            else if ((Object)cref1 == null) return false;
+            else return cref0.ColumnIndex < cref1.ColumnIndex || (cref0.Column == cref1.Column && cref0.Row < cref1.Row);
         }
         public static bool operator>(CellReference cref0, CellReference cref1)
         {
+            if ((Object)cref0 == null) return (Object)cref1 != null;
+            else if ((Object)cref1 == null) return true;
             return cref0.ColumnIndex > cref1.ColumnIndex || (cref0.Column == cref1.Column && cref0.Row > cref1.Row);
         }
         public static bool operator<=(CellReference cref0, CellReference cref1)
@@ -124,7 +130,7 @@ namespace ExcelAdaptor
         }
         public override string ToString()
         {
-            if (this == Null)
+            if (this == null || this == Null)
                 return "";
             else
                 return Column + Row.ToString();

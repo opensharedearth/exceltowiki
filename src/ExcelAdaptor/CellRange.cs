@@ -90,7 +90,8 @@ namespace ExcelAdaptor
         /// <returns>   The result of the operation. </returns>
         static public bool operator==(CellRange crange0, CellRange crange1)
         {
-            return crange0.Equals(crange1);
+            if ((Object)crange0 == null) return (Object)crange1 == null;
+            else return crange0.Equals(crange1);
         }
         /// <summary>   Inequality operator. </summary>
         ///
@@ -100,6 +101,7 @@ namespace ExcelAdaptor
         /// <returns>   The result of the operation. </returns>
         static public bool operator!=(CellRange crange0, CellRange crange1)
         {
+            if ((Object)crange0 == null) return (Object)crange1 != null;
             return !crange0.Equals(crange1);
         }
         /// <summary>   Gets column count of the cell range. </summary>

@@ -87,10 +87,13 @@ namespace ExcelAdaptor.Test
         [InlineData("A1", "A2", true, false, false)]
         [InlineData("AA1", "aa1", false, true, false)]
         [InlineData("AA4", "ZZ1", true, false, false)]
+        [InlineData("A1", null, false, false, true)]
+        [InlineData(null, "A1", true, false, false)]
+        [InlineData(null, null, false, true, false)]
         public void ComparisonTest(string s0, string s1, bool lt, bool eq, bool gt)
         {
-            var cr0 = new CellReference(s0);
-            var cr1 = new CellReference(s1);
+            CellReference cr0 = s0 == null ? null : new CellReference(s0);
+            CellReference cr1 = s1 == null ? null : new CellReference(s1);
             Assert.Equal(eq, cr0 == cr1);
             Assert.NotEqual(eq, cr0 != cr1);
             Assert.Equal(lt, cr0 < cr1);
