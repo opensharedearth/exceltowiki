@@ -35,13 +35,20 @@ namespace WikiAdaptor
         public async void Login(string username, string password)
         {
             string token = await GetLoginToken();
-            string escapedToken = Uri.EscapeDataString(token);
-            string loginString = $"lgtoken={escapedToken}&lgpassword={password}";
-            HttpContent loginContent = new StringContent(loginString, Encoding.UTF8, "application/x-www-form-urlencoded");
-            var loginResult = await _client.PostAsync($"api.php?action=login&format=json&lgname={username}", loginContent);
-            if (!loginResult.IsSuccessStatusCode)
-                throw new HttpRequestException($"Login failed with {loginResult.StatusCode}");
-            _token = await GetCsrfToken();
+            if(token != null)
+            {
+                string escapedToken = Uri.EscapeDataString(token);
+                string loginString = $"lgtoken={escapedToken}&lgpassword={password}";
+                HttpContent loginContent = new StringContent(loginString, Encoding.UTF8, "application/x-www-form-urlencoded");
+                var loginResult = await _client.PostAsync($"api.php?action=login&format=json&lgname={username}", loginContent);
+                if (!loginResult.IsSuccessStatusCode)
+                    throw new HttpRequestException($"Login failed with {loginResult.StatusCode}");
+                _token = await GetCsrfToken();
+            }
+            else
+            {
+                throw new ApplicationException("Unable to get login token for wiki");
+            }
         }
         public async Task<string> GetLoginToken()
         {
@@ -50,7 +57,7 @@ namespace WikiAdaptor
             {
                 var content = await result.Content.ReadAsStringAsync();
                 JObject json = JsonConvert.DeserializeObject(content) as JObject;
-                return json["query"]["token"].Value<string>("logintoken");
+                return json["query"]["tokens"].Value<string>("logintoken");
             }
             return null;
         }
@@ -61,7 +68,7 @@ namespace WikiAdaptor
             {
                 var content = await result.Content.ReadAsStringAsync();
                 JObject json = JsonConvert.DeserializeObject(content) as JObject;
-                return json["query"]["token"].Value<string>("csrftoken");
+                return json["query"]["tokens"].Value<string>("csrftoken");
             }
             return null;
         }
@@ -79,11 +86,11 @@ namespace WikiAdaptor
             sb.Append("&format=json");
             sb.Append($"&title={Uri.EscapeDataString(title)}");
             sb.Append($"&summary={Uri.EscapeDataString(summary)}");
-            sb.Append("contentformat=text/x-wiki");
+            sb.Append("&contentformat=text/x-wiki");
             if (!overwrite) sb.Append("&createonly");
             return sb.ToString();
         }
-        public async void CreatePage(string title, string summary, string content, bool overwrite = false)
+        public async Task CreatePage(string title, string summary, string content, bool overwrite = false)
         {
             CheckToken();
             var multipart = new MultipartFormDataContent(Guid.NewGuid().ToString());
@@ -95,7 +102,7 @@ namespace WikiAdaptor
                 throw new HttpRequestException(result.ReasonPhrase);
             }
         }
-        public async void CreatePage(string title, string summary, Stream content, bool overwrite = false)
+        public async Task CreatePage(string title, string summary, Stream content, bool overwrite = false)
         {
             CheckToken();
             var multipart = new MultipartFormDataContent(Guid.NewGuid().ToString());

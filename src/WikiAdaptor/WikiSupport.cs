@@ -10,7 +10,7 @@ namespace WikiAdaptor
         {
             if(!String.IsNullOrEmpty(title))
             {
-                if (title.IndexOfAny("[]()|#<>%+?".ToCharArray()) < 0) return true;
+                if (title.IndexOfAny("[]{}|#<>%+?".ToCharArray()) < 0) return true;
             }
             return false;
         }

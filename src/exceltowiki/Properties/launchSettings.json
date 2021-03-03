@@ -2,8 +2,17 @@
   "profiles": {
     "exceltowiki2": {
       "commandName": "Project",
+      "commandLineArgs": "\"D:\\rundle\\Development\\PetroWiki\\exceltowiki\\test\\exceltowiki.Test\\input\\API-metadata.xlsx\" --columns \"R,P,L,AC,AP\" --formats \",,,,date\" --headers --date-format dd-MMM-yy --wiki http://localhost/pud-wiki --username Bobrundle@exceltowiki --password p09vuk1ebl55416tfq7757qp8s0b8utn --table-title \"API Standards\" --title-column R --page-columns \"P,L,AC,AP\" --page-format \",,,date\" --page-prefix \"API Standard\" --overwrite",
+      "workingDirectory": "D:\\scratch\\exceltowiki.Test"
+    },
+    "basicTest": {
+      "commandName": "Project",
       "commandLineArgs": "\"D:\\rundle\\Development\\PetroWiki\\exceltowiki\\test\\exceltowiki.Test\\input\\API-metadata.xlsx\" --columns \"B,P,L,AC,AP\" --formats \",,,,date\" --headers --date-format dd-MMM-yy >write-table.wiki",
       "workingDirectory": "D:\\scratch\\exceltowiki.Test"
+    },
+    "wikiTable": {
+      "commandName": "Project",
+      "commandLineArgs": "\"D:\\rundle\\Development\\PetroWiki\\exceltowiki\\test\\exceltowiki.Test\\input\\API-metadata.xlsx\" --columns \"B,P,L,AC,AP\" --formats \",,,,date\" --headers --date-format dd-MMM-yy --overwrite --wiki http://localhost/pud-wiki --username Bobrundle@exceltowiki --password p09vuk1ebl55416tfq7757qp8s0b8utn --table-title \"API Standards\""
     }
   }
 }

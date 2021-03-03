@@ -116,7 +116,7 @@ namespace ExcelAdaptor
         }
         public static bool operator>(CellReference cref0, CellReference cref1)
         {
-            if ((Object)cref0 == null) return (Object)cref1 != null;
+            if ((Object)cref0 == null) return false;
             else if ((Object)cref1 == null) return true;
             return cref0.ColumnIndex > cref1.ColumnIndex || (cref0.Column == cref1.Column && cref0.Row > cref1.Row);
         }

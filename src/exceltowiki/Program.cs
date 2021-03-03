@@ -56,6 +56,8 @@ namespace exceltowiki
             FormatType[] pageFormats = null;
             bool overwrite = false;
             bool noTable = false;
+            bool noPages = false;
+            string editSummary = "Modified by exceltowiki";
             CellRange range = null;
             try
             {
@@ -112,6 +114,13 @@ namespace exceltowiki
                         case "--no-table":
                             noTable = true;
                             break;
+                        case "--no-pages":
+                            noPages = true;
+                            break;
+                        case "--edit-summary":
+                            editSummary = GetEditSummary(GetArg(args, ++i));
+                            break;
+
                         case "--help":
                             Usage();
                             return;
@@ -132,23 +141,30 @@ namespace exceltowiki
                 bool wikiOut = wikiurl != null;
                 if (wikiOut && (username == null | password == null)) throw new ArgumentException("Both username and password must be specified for a wiki desination");
                 if (wikiOut && tableTitle == null) throw new ArgumentException("The table title must be specified for a wiki destination");
+                if ((pageColumnNames != null || pageFormats != null) && titleColumn == null) throw new ArgumentException("Column title must be specified if wiki pages are to be created.");
                 WikiAdaptor.WikiAdaptor wiki = null;
-                if(wikiOut)
+                if (wikiOut)
                 {
                     wiki = new WikiAdaptor.WikiAdaptor(wikiurl);
                     wiki.Login(username, password);
                 }
                 ConvertExcelToWiki(inputFile, wiki, worksheet, columnNames, columnFormats, dateFormat, headers,
-                    noTable, overwrite, tableTitle, titleColumn, pagePrefix, pageColumnNames, pageFormats);
-                if(wikiOut)
+                    noTable, noPages, overwrite, tableTitle, titleColumn, pagePrefix, pageColumnNames, pageFormats, editSummary);
+                if (wikiOut)
                 {
                     wiki.Dispose();
                 }
             }
             catch (Exception ex)
             {
-                Usage(ex.Message);
+                WriteError(ex);
+                Usage();
             }
+        }
+
+        private static string GetEditSummary(string v)
+        {
+            return v;
         }
 
         private static string GetPagePrefix(string v)
@@ -180,7 +196,11 @@ namespace exceltowiki
 
         private static string GetUrl(string v)
         {
-            if (Uri.TryCreate(v, UriKind.Absolute, out Uri uri)) return v;
+            if (Uri.TryCreate(v, UriKind.Absolute, out Uri uri))
+            {
+                if (v.Last() != '/') v += '/';
+                return v;
+            }
             throw new ArgumentException("wikiurl argument is invalid.");
         }
 
@@ -224,14 +244,15 @@ namespace exceltowiki
         }
 
         internal static void ConvertExcelToWiki(string inputFile, WikiAdaptor.WikiAdaptor wiki, WorksheetDef worksheetDef, string[] columnNames, FormatType[] columnFormats, string dateFormat, bool headers,
-             bool noTable, bool overwrite, string tableTitle, string titleColumn, string pagePrefix, string[] pageColumnNames, FormatType[] pageColumnFormats)
+             bool noTable, bool noPages, bool overwrite, string tableTitle, string titleColumn, string pagePrefix, string[] pageColumnNames, FormatType[] pageColumnFormats,
+             string editSummary)
         {
             try
             {
                 bool wikiOut = wiki != null;
                 TextWriter writer = Console.Out;
                 MemoryStream outputStream = null;
-                if(wikiOut)
+                if (wikiOut)
                 {
                     outputStream = new MemoryStream();
                     writer = new StreamWriter(outputStream);
@@ -248,7 +269,7 @@ namespace exceltowiki
                         int ncolumns = worksheet.ColumnCount;
                         int row1 = 1;
                         int column1 = 1;
-                        if(range != null)
+                        if (range != null)
                         {
                             nrows = range.GetRowCount();
                             ncolumns = range.GetColumnCount();
@@ -274,17 +295,25 @@ namespace exceltowiki
                                 }
                                 else
                                 {
-                                    WriteError($"\rWriting table row {rowIndex + 1} of {nrows}.", false);
+                                    WriteError($"\rWriting table row {rowIndex} of {nrows}.", false);
                                     writer.WriteLine("|-");
                                     for (int i = 0; i < columns.Length; ++i)
                                     {
                                         string column = columns[i].Name;
                                         string s = worksheet.Cells(rowIndex, column).ToString();
                                         string s1 = FormatColumn(s, columns[i]);
-                                        writer.WriteLine("|" + s1);
+                                        if (column == titleColumn)
+                                        {
+                                            writer.WriteLine("|" + GetPageLink(pagePrefix, s1));
+                                        }
+                                        else
+                                        {
+                                            writer.WriteLine("|" + s1);
+                                        }
                                     }
                                 }
                             }
+                            WriteError(" Finished.");
                         }
                         else
                         {
@@ -293,28 +322,31 @@ namespace exceltowiki
                         if (wikiOut)
                         {
                             writer.Flush();
-                            writer.Close();
                             outputStream.Position = 0L;
-                            if(!noTable)
+                            ColumnDef[] pageColumns = GetColumns(column1, ncolumns, pageColumnNames, pageColumnFormats, dateFormat);
+                            if (!noTable)
                             {
-                                ColumnDef[] pageColumns = GetColumns(column1, ncolumns, pageColumnNames, pageColumnFormats, dateFormat);
                                 try
                                 {
-                                    wiki.CreatePage(tableTitle, "exceltowiki created table", outputStream);
+                                    wiki.CreatePage(tableTitle, editSummary, outputStream, overwrite).Wait();
+                                    WriteError($"Created wiki table {tableTitle}");
                                 }
                                 catch (Exception ex)
                                 {
                                     WriteError("*Warning* Unable to create wiki table: " + ex.Message);
                                 }
+                            }
+                            if (titleColumn != null && !noPages)
+                            {
                                 Dictionary<string, string> sectionTitles = new Dictionary<string, string>();
                                 for (int rowIndex = row1; rowIndex <= nrows; ++rowIndex)
                                 {
                                     if (headers && rowIndex == row1)
                                     {
-                                        foreach (var column in columnNames)
+                                        foreach (var column in pageColumnNames)
                                         {
                                             string s = worksheet.Cells(rowIndex, column).ToString();
-                                            if(!String.IsNullOrEmpty(s))
+                                            if (!String.IsNullOrEmpty(s))
                                             {
                                                 sectionTitles[column] = s.Trim();
                                             }
@@ -322,34 +354,44 @@ namespace exceltowiki
                                     }
                                     else
                                     {
+                                        HashSet<string> titles = new HashSet<string>();
                                         string title = worksheet.Cells(rowIndex, titleColumn).ToString();
-                                        if(WikiSupport.IsValidTitle(title))
+                                        if (WikiSupport.IsValidTitle(title))
                                         {
-                                            StringBuilder sb = new StringBuilder();
-                                            for (int i = 0; i < columns.Length; ++i)
+                                            if (!titles.Contains(title))
                                             {
-                                                string column = columns[i].Name;
-                                                if(sectionTitles.TryGetValue(column, out string sectionTitle))
+                                                titles.Add(title);
+                                                StringBuilder sb = new StringBuilder();
+                                                for (int i = 0; i < pageColumns.Length; ++i)
                                                 {
-                                                    sb.AppendLine($"=={sectionTitle}==");
-                                                    sb.AppendLine();
+                                                    string column = pageColumns[i].Name;
+                                                    if (sectionTitles.TryGetValue(column, out string sectionTitle))
+                                                    {
+                                                        sb.AppendLine($"=={sectionTitle}==");
+                                                        sb.AppendLine();
+                                                    }
+                                                    string s = worksheet.Cells(rowIndex, column).ToString();
+                                                    string s1 = FormatColumn(s, pageColumns[i]);
+                                                    sb.AppendLine(s1);
                                                 }
-                                                string s = worksheet.Cells(rowIndex, column).ToString();
-                                                string s1 = FormatColumn(s, columns[i]);
-                                                sb.AppendLine(s1);
+                                                try
+                                                {
+                                                    wiki.CreatePage(GetPageTitle(pagePrefix, title), editSummary, sb.ToString(), overwrite).Wait();
+                                                    WriteError($"Created page {title}");
+                                                }
+                                                catch (Exception ex)
+                                                {
+                                                    WriteError($"Unable to create wiki page from row {rowIndex}: {ex.Message}");
+                                                }
                                             }
-                                            try
+                                            else
                                             {
-                                                wiki.CreatePage(title, "exceltowiki created page", sb.ToString(), overwrite);
-                                            }
-                                            catch(Exception ex)
-                                            {
-                                                WriteError($"Unable to create wiki page from row {rowIndex}: {ex.Message}");
+                                                WriteError($"Duplicate wiki page title {title} at row {rowIndex}...skipping");
                                             }
                                         }
                                         else
                                         {
-                                            WriteError($"Invalid wiki page title at row {rowIndex}...skipping.");
+                                            WriteError($"Invalid wiki page title {title} at row {rowIndex}...skipping.");
                                         }
                                     }
                                 }
@@ -368,9 +410,33 @@ namespace exceltowiki
             }
         }
 
+        private static string GetPageLink(string pagePrefix, string s1)
+        {
+            if (String.IsNullOrEmpty(pagePrefix))
+            {
+                return "[[" + s1 + "]]";
+            }
+            else
+            {
+                return "[[" + pagePrefix + " " + s1 + "|" + s1 + "]]";
+            }
+        }
+        public static string GetPageTitle(string pagePrefix, string title)
+        {
+            if (String.IsNullOrEmpty(pagePrefix))
+            {
+                return title;
+            }
+            else
+            {
+                return pagePrefix + " " + title;
+            }
+
+        }
+
         internal static string[] GetExcelColumns(int column1, int ncolumns)
         {
-            if (column1 + ncolumns - 1> 26 * 26) throw new ApplicationException("Source table has too many columns.");
+            if (column1 + ncolumns - 1 > 26 * 26) throw new ApplicationException("Source table has too many columns.");
             List<string> columns = new List<string>();
             for (int i = column1 - 1; i < column1 + ncolumns - 1; i++)
             {
@@ -459,6 +525,12 @@ namespace exceltowiki
             }
             return formats.ToArray();
         }
+        private static void WriteError(Exception ex)
+        {
+            WriteError(ex.Message);
+            if (ex.InnerException != null)
+                WriteError(ex.InnerException);
+        }
         private static void WriteError(string[] lines)
         {
             foreach (var line in lines)
@@ -492,7 +564,8 @@ namespace exceltowiki
                 "exceltowiki input [--columns clist] [--format flist] [--worksheet sname] [--date-format dformat] [--headers]",
                 "                  [--wiki wikiurl --username username --password password] [--overwrite]",
                 "                  [--table-title title | --no-table] [--title-column tcolumn]",
-                "                  [--page-prefix prefix] [--page-columns pclist] [--page-format pflist]",
+                "                  [--page-prefix prefix] [--no-pages] [--page-columns pclist] [--page-format pflist]",
+                "                  [--edit-summary summary]",
                 "",
                 "\tinput         Path to input Excel spreadsheet file (.xls)",
                 "\t--columns     Comma separated list of column names, e.g. A,C,D,AA,B",
@@ -503,14 +576,16 @@ namespace exceltowiki
                 "\t--date-format Format of date output on date conversion of column data",
                 "\t--wiki        Destination wiki",
                 "\t--username    Username for wiki login",
-                "\t--overwrite   Overwrite wiki pages if they already exist",
-                "\t--no-table    Do not write the table into the wiki",
                 "\t--password    Password for wiki login (bot password)",
+                "\t--overwrite   Overwrite wiki pages if they already exist",
                 "\t--table-title The title of the wiki page containing the table",
+                "\t--no-table    Do not write the table into the wiki",
                 "\t--title-column    The column in the Excel spreadsheet that contains the title of the wiki page to be created",
+                "\t--no-pages    Pages are not created.  Links are still inserted in table if title-column defined.",
                 "\t--page-prefix The prefix that is prepended to the title of each wiki page created except for the table page",
                 "\t--page-columns    Comma separated list of Excel columns that become wiki page sections. Section name taken from column header.",
                 "\t--page-format Comma separated list of formats for excel columns that become wiki page sections",
+                "\t--edit-summary    The description of the page edit.  By default \"Modified by exceltowiki\"",
                 "\t--help        display usage",
                 "\t--version     display version",
                 "",
@@ -527,7 +602,8 @@ namespace exceltowiki
                 "\ttitle         The title of the wiki page that contains the table",
                 "\tprefix        The prefix for all of the wiki pages created except for the table page",
                 "\tpclist        The comma separated list of spreadsheet column that become sections in the wiki page",
-                "\tpflist        The comma separated format list of the spreadsheet column that will become sections of the wiki page"
+                "\tpflist        The comma separated format list of the spreadsheet column that will become sections of the wiki page",
+                "\tsummary       The page edit description"
             };
             WriteError(usage);
         }
