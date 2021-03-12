@@ -57,6 +57,7 @@ namespace exceltowiki
             bool overwrite = false;
             bool noTable = false;
             bool noPages = false;
+            bool testLogin = false;
             string editSummary = "Modified by exceltowiki";
             CellRange range = null;
             try
@@ -117,6 +118,9 @@ namespace exceltowiki
                         case "--no-pages":
                             noPages = true;
                             break;
+                        case "--test-login":
+                            testLogin = true;
+                            break;
                         case "--edit-summary":
                             editSummary = GetEditSummary(GetArg(args, ++i));
                             break;
@@ -136,13 +140,22 @@ namespace exceltowiki
                     }
                 }
                 worksheet.Range = range;
+                bool wikiOut = wikiurl != null;
+                WikiAdaptor.WikiAdaptor wiki = null;
+                if (testLogin)
+                {
+                    if (!wikiOut) throw new ArgumentException("Test login needs a wiki url specified as well as username and password");
+                    if (username == null | password == null) throw new ArgumentException("Test login needs both username and password arguments");
+                    wiki = new WikiAdaptor.WikiAdaptor(wikiurl);
+                    wiki.Login(username, password);
+                    WriteError("Login successful!");
+                    return;
+                }
                 if (inputFile == null) throw new ApplicationException("Missing input file argument.");
                 if (!File.Exists(inputFile)) throw new ApplicationException($"Input file '{inputFile}' does not exist.");
-                bool wikiOut = wikiurl != null;
                 if (wikiOut && (username == null | password == null)) throw new ArgumentException("Both username and password must be specified for a wiki desination");
                 if (wikiOut && tableTitle == null) throw new ArgumentException("The table title must be specified for a wiki destination");
                 if ((pageColumnNames != null || pageFormats != null) && titleColumn == null) throw new ArgumentException("Column title must be specified if wiki pages are to be created.");
-                WikiAdaptor.WikiAdaptor wiki = null;
                 if (wikiOut)
                 {
                     wiki = new WikiAdaptor.WikiAdaptor(wikiurl);
@@ -567,6 +580,8 @@ namespace exceltowiki
                 "                  [--page-prefix prefix] [--no-pages] [--page-columns pclist] [--page-format pflist]",
                 "                  [--edit-summary summary]",
                 "",
+                "exceltowiki --test-login --wiki wikiurl --username username --password password",
+                "",
                 "\tinput         Path to input Excel spreadsheet file (.xls)",
                 "\t--columns     Comma separated list of column names, e.g. A,C,D,AA,B",
                 "\t--format      Comma separated list of format conversions, e.g. date,,date",
@@ -586,6 +601,7 @@ namespace exceltowiki
                 "\t--page-columns    Comma separated list of Excel columns that become wiki page sections. Section name taken from column header.",
                 "\t--page-format Comma separated list of formats for excel columns that become wiki page sections",
                 "\t--edit-summary    The description of the page edit.  By default \"Modified by exceltowiki\"",
+                "\t--test-login  Test the login credentials for the wiki",
                 "\t--help        display usage",
                 "\t--version     display version",
                 "",

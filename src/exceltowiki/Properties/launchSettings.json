@@ -2,7 +2,7 @@
   "profiles": {
     "exceltowiki2": {
       "commandName": "Project",
-      "commandLineArgs": "\"D:\\rundle\\Development\\PetroWiki\\exceltowiki\\test\\exceltowiki.Test\\input\\API-metadata.xlsx\" --columns \"R,P,L,AC,AP\" --formats \",,,,date\" --headers --date-format dd-MMM-yy --wiki http://localhost/pud-wiki --username Bobrundle@exceltowiki --password p09vuk1ebl55416tfq7757qp8s0b8utn --table-title \"API Standards\" --title-column R --page-columns \"P,L,AC,AP\" --page-format \",,,date\" --page-prefix \"API Standard\" --overwrite",
+      "commandLineArgs": "--test-login \"D:\\rundle\\Development\\PetroWiki\\exceltowiki\\test\\exceltowiki.Test\\input\\API-metadata.xlsx\" --columns \"R,P,L,AC,AP\" --formats \",,,,date\" --headers --date-format dd-MMM-yy --wiki http://petrowiki.opensharedearth.org --username Bobrundle@exceltowiki --password 7aro5hoopgkrga1u5qdkrjtrbttjdkak --table-title \"API Standards\" --title-column R --page-columns \"P,L,AC,AP\" --page-format \",,,date\" --page-prefix \"API Standard\" --overwrite --no-table",
       "workingDirectory": "D:\\scratch\\exceltowiki.Test"
     },
     "basicTest": {

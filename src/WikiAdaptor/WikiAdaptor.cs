@@ -43,6 +43,24 @@ namespace WikiAdaptor
                 var loginResult = await _client.PostAsync($"api.php?action=login&format=json&lgname={username}", loginContent);
                 if (!loginResult.IsSuccessStatusCode)
                     throw new HttpRequestException($"Login failed with {loginResult.StatusCode}");
+                else
+                {
+                    var content = await loginResult.Content.ReadAsStringAsync();
+                    JObject json = JsonConvert.DeserializeObject(content) as JObject;
+                    var loginStatus = json["login"];
+                    if(loginStatus != null)
+                    {
+                        string result = loginStatus.Value<string>("result");
+                        if (string.Compare(result, "Success", true) != 0)
+                        {
+                            throw new ApplicationException($"Login failed. Result = {result}.");
+                        }
+                    }
+                    else
+                    {
+                        throw new ApplicationException($"Login failed for unknown reason.");
+                    }
+                }
                 _token = await GetCsrfToken();
             }
             else

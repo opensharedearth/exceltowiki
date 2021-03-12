@@ -8,6 +8,8 @@ exceltowiki input [--columns clist] [--format flist] [--worksheet sname] [--date
                   [--page-prefix prefix] [--no-pages] [--page-columns pclist] [--page-format pflist]
                   [--edit-summary summary]
 
+exceltowiki --test-login --wiki wikiurl --username username --password password
+
 	input         Path to input Excel spreadsheet file (.xls)
 	--columns     Comma separated list of column names, e.g. A,C,D,AA,B
 	--format      Comma separated list of format conversions, e.g. date,,date
@@ -27,6 +29,7 @@ exceltowiki input [--columns clist] [--format flist] [--worksheet sname] [--date
 	--page-columns    Comma separated list of Excel columns that become wiki page sections. Section name taken from column header.
 	--page-format Comma separated list of formats for excel columns that become wiki page sections
 	--edit-summary    The description of the page edit.  By default "Modified by exceltowiki"
+	--test-login  Test the login credentials for the wiki
 	--help        display usage
 	--version     display version
 
