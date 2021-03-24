@@ -147,7 +147,7 @@ namespace exceltowiki
                     if (!wikiOut) throw new ArgumentException("Test login needs a wiki url specified as well as username and password");
                     if (username == null | password == null) throw new ArgumentException("Test login needs both username and password arguments");
                     wiki = new WikiAdaptor.WikiAdaptor(wikiurl);
-                    wiki.Login(username, password);
+                    wiki.Login(username, password).Wait();
                     WriteError("Login successful!");
                     return;
                 }
@@ -159,7 +159,7 @@ namespace exceltowiki
                 if (wikiOut)
                 {
                     wiki = new WikiAdaptor.WikiAdaptor(wikiurl);
-                    wiki.Login(username, password);
+                    wiki.Login(username, password).Wait();
                 }
                 ConvertExcelToWiki(inputFile, wiki, worksheet, columnNames, columnFormats, dateFormat, headers,
                     noTable, noPages, overwrite, tableTitle, titleColumn, pagePrefix, pageColumnNames, pageFormats, editSummary);
@@ -168,10 +168,13 @@ namespace exceltowiki
                     wiki.Dispose();
                 }
             }
+            catch(AggregateException exs)
+            {
+                WriteError(exs);
+            }
             catch (Exception ex)
             {
                 WriteError(ex);
-                Usage();
             }
         }
 
@@ -344,6 +347,10 @@ namespace exceltowiki
                                     wiki.CreatePage(tableTitle, editSummary, outputStream, overwrite).Wait();
                                     WriteError($"Created wiki table {tableTitle}");
                                 }
+                                catch(AggregateException exs)
+                                {
+                                    WriteError(exs);
+                                }
                                 catch (Exception ex)
                                 {
                                     WriteError("*Warning* Unable to create wiki table: " + ex.Message);
@@ -391,6 +398,11 @@ namespace exceltowiki
                                                 {
                                                     wiki.CreatePage(GetPageTitle(pagePrefix, title), editSummary, sb.ToString(), overwrite).Wait();
                                                     WriteError($"Created page {title}");
+                                                }
+                                                catch(AggregateException exs)
+                                                {
+                                                    WriteError($"Unable to create wiki page from row {rowIndex}");
+                                                    WriteError(exs);
                                                 }
                                                 catch (Exception ex)
                                                 {
@@ -537,6 +549,13 @@ namespace exceltowiki
                 }
             }
             return formats.ToArray();
+        }
+        private static void WriteError(AggregateException exs)
+        {
+            foreach (var ex in exs.InnerExceptions)
+            {
+                WriteError(ex);
+            }
         }
         private static void WriteError(Exception ex)
         {

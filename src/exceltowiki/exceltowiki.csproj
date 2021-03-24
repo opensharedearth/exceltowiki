@@ -3,7 +3,7 @@
 <PropertyGroup>
   <OutputType>Exe</OutputType>
   <TargetFramework>net5.0</TargetFramework>
-  <Version>3.2.0</Version>
+  <Version>3.3.0</Version>
   <Authors>Open Shared Earth, LLC</Authors>
   <Company>Open Shared Earth, LLC</Company>
   <Product>Excel spreadsheet to wiki text conversion</Product>
@@ -12,6 +12,8 @@
   <PackageLicenseExpression>MIT</PackageLicenseExpression>
   <PackageIcon>exceltowiki.png</PackageIcon>
   <PackageReleaseNotes>Added --test-login switch</PackageReleaseNotes>
+  <AssemblyVersion>3.3.0.0</AssemblyVersion>
+  <FileVersion>3.3.0.0</FileVersion>
 </PropertyGroup>
 
 <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">

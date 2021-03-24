@@ -32,7 +32,7 @@ namespace WikiAdaptor
                 throw new HttpRequestException($"Login failed with {clientLoginResult.StatusCode}");
             _token = await GetCsrfToken();
         }
-        public async void Login(string username, string password)
+        public async Task Login(string username, string password)
         {
             string token = await GetLoginToken();
             if(token != null)
@@ -47,8 +47,15 @@ namespace WikiAdaptor
                 {
                     var content = await loginResult.Content.ReadAsStringAsync();
                     JObject json = JsonConvert.DeserializeObject(content) as JObject;
+                    var error = json["error"];
                     var loginStatus = json["login"];
-                    if(loginStatus != null)
+                    if(error != null)
+                    {
+                        string code = error.Value<string>("code");
+                        string info = error.Value<string>("info");
+                        throw new ApplicationException($"Login failed. Code = {code}, info = {info}");
+                    }
+                    else if(loginStatus != null)
                     {
                         string result = loginStatus.Value<string>("result");
                         if (string.Compare(result, "Success", true) != 0)
@@ -119,7 +126,25 @@ namespace WikiAdaptor
             {
                 throw new HttpRequestException(result.ReasonPhrase);
             }
+            else
+            {
+                var responseContent = await result.Content.ReadAsStringAsync();
+                JObject json = JsonConvert.DeserializeObject(responseContent) as JObject;
+                CheckError("Create page",json);
+            }
         }
+
+        private void CheckError(string description, JObject json)
+        {
+            var error = json["error"];
+            if(error != null)
+            {
+                string code = error.Value<string>("code");
+                string info = error.Value<string>("info");
+                throw new ApplicationException($"{description} failed. Code = {code}, info = {info}");
+            }
+        }
+
         public async Task CreatePage(string title, string summary, Stream content, bool overwrite = false)
         {
             CheckToken();
@@ -130,6 +155,12 @@ namespace WikiAdaptor
             if (!result.IsSuccessStatusCode)
             {
                 throw new HttpRequestException(result.ReasonPhrase);
+            }
+            else
+            {
+                var responseContent = await result.Content.ReadAsStringAsync();
+                JObject json = JsonConvert.DeserializeObject(responseContent) as JObject;
+                CheckError("Create page", json);
             }
         }
 
